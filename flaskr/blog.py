@@ -6,6 +6,8 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
+from flaskr.foliummaps import create_map_html
+
 bp = Blueprint('blog', __name__)
 
 @bp.route('/')
@@ -16,7 +18,11 @@ def index():
         ' FROM post p JOIN user u ON p.author_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
-    return render_template('blog/index.html', posts=posts)
+
+    start_coords = (25.775084, -80.1947)
+    folium_map = create_map_html(start_coords)
+
+    return render_template('blog/index.html', posts=posts, folium_map=folium_map)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
